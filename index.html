@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Nithyananthan | 3D Systems Architect · Full Stack & Embedded</title>
+  <title>Nithyananthan | Full Stack & Embedded</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -57,9 +57,69 @@
       overflow-x: hidden;
       scroll-behavior: smooth;
       transition: background 0.3s ease, color 0.2s ease;
+      cursor: none;
     }
 
-    /* 3D Canvas Background - ENLARGED & MORE PROMINENT */
+    /* Comet Cursor - Realistic Comet Shape */
+    .comet-cursor {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff5e0, #ffcc33, #ff9900);
+      box-shadow: 0 0 20px rgba(255, 153, 0, 0.9), 0 0 8px rgba(255, 204, 51, 0.8);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.1s, height 0.1s;
+    }
+    
+    /* Comet Tail */
+    .comet-tail {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.8;
+    }
+    
+    .tail-segment {
+      position: absolute;
+      background: linear-gradient(90deg, rgba(255, 153, 0, 0.7), rgba(255, 200, 50, 0.3), transparent);
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+
+    /* Hide custom cursor on mobile/touch devices */
+    @media (max-width: 768px) {
+      .comet-cursor, .comet-tail {
+        display: none;
+      }
+      body {
+        cursor: auto;
+      }
+    }
+
+    /* Menu Overlay for mobile */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* 3D Canvas Background */
     #threeCanvas {
       position: fixed;
       top: 0;
@@ -68,12 +128,11 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      /* Increased opacity for better visibility */
       opacity: 0.85;
       transform: scale(1.1);
     }
 
-    /* Meteor Canvas - added for meteor shower animation */
+    /* Meteor Canvas */
     #meteorCanvas {
       position: fixed;
       top: 0;
@@ -194,6 +253,8 @@
       font-size: 26px;
       color: var(--text-primary);
       cursor: pointer;
+      z-index: 1001;
+      position: relative;
     }
 
     /* Hero */
@@ -360,7 +421,6 @@
       margin-top: 12px;
     }
 
-    /* Sections - ALL with transparent background for glass effect */
     section {
       padding: 100px 60px;
       background: var(--section-bg);
@@ -391,7 +451,6 @@
       margin-bottom: 56px;
     }
 
-    /* Glass Cards */
     .grid-3d {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -446,7 +505,6 @@
       border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
-    /* Projects Glass - FIXED: transparent background */
     .projects-3d {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -524,7 +582,6 @@
       padding: 24px 28px 32px;
     }
 
-    /* Boards Glass */
     .boards-3d {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -561,7 +618,6 @@
       color: var(--accent-primary);
     }
 
-    /* Terminal */
     .terminal-3d {
       background: var(--terminal-bg);
       border-radius: 20px;
@@ -603,7 +659,6 @@
       color: #10b981;
     }
 
-    /* Contact */
     .contact-3d {
       background: var(--contact-bg);
       text-align: center;
@@ -672,7 +727,6 @@
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
-    /* Reveal Animation */
     .reveal {
       opacity: 0;
       transform: translateY(30px);
@@ -684,7 +738,6 @@
       transform: translateY(0);
     }
 
-    /* Mobile Responsive */
     @media (max-width: 880px) {
       .desktop-only {
         display: none;
@@ -765,6 +818,7 @@
 <body>
   <div id="threeCanvas"></div>
   <canvas id="meteorCanvas"></canvas>
+  <div id="menuOverlay" class="menu-overlay"></div>
 
   <div class="content">
     <nav>
@@ -787,6 +841,7 @@
       </div>
     </nav>
 
+    <!-- All content sections remain exactly the same -->
     <section class="hero">
       <div class="hero-content">
         <div class="hero-badge reveal"><i class="fas fa-cube"></i> FULL STACK & INDUSTRIAL ARCHITECT</div>
@@ -807,90 +862,144 @@
       <div class="metric-card reveal"><div class="metric-number" data-count="100">0%</div><div class="metric-label">ZERO DOWNTIME</div></div>
     </div>
 
-    <section id="stack">
-      <div class="section-eyebrow reveal">EXPERTISE MATRIX</div>
-      <h2 class="section-title reveal">Every Layer of the Stack</h2>
-      <p class="section-sub reveal">From frontend pixels to firmware bits — rare fusion of web-scale and deep embedded engineering.</p>
-      <div class="grid-3d">
-        <div class="card-3d reveal"><div class="card-icon"><i class="fas fa-code"></i></div><div class="card-title">Frontend</div><p>Production Angular & React apps with real-time industrial dashboards.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">React</span><span class="tag-3d">TypeScript</span></div></div>
-        <div class="card-3d reveal"><div class="card-icon"><i class="fas fa-server"></i></div><div class="card-title">Backend</div><p>Scalable Node.js, Python, Express powering industrial data pipelines & MQTT.</p><div class="tag-cluster"><span class="tag-3d">Node.js</span><span class="tag-3d">Python</span><span class="tag-3d">Express</span><span class="tag-3d">MQTT</span></div></div>
-        <div class="card-3d reveal"><div class="card-icon"><i class="fas fa-database"></i></div><div class="card-title">Databases</div><p>Multi-database expertise for high-throughput industrial workloads.</p><div class="tag-cluster"><span class="tag-3d">MySQL</span><span class="tag-3d">MSSQL</span><span class="tag-3d">PostgreSQL</span><span class="tag-3d">Redis</span></div></div>
-        <div class="card-3d reveal"><div class="card-icon"><i class="fas fa-industry"></i></div><div class="card-title">Industrial Protocols</div><p>Direct PLC communication: Modbus RTU/TCP, PyLogix, Beckhoff ADS.</p><div class="tag-cluster"><span class="tag-3d">Modbus RTU/TCP</span><span class="tag-3d">PyLogix</span><span class="tag-3d">Beckhoff ADS</span></div></div>
-        <div class="card-3d reveal"><div class="card-icon"><i class="fas fa-microchip"></i></div><div class="card-title">Embedded Systems</div><p>Low-level firmware C/C++, MicroPython across ARM, AVR, Linux SBC.</p><div class="tag-cluster"><span class="tag-3d">C/C++</span><span class="tag-3d">MicroPython</span><span class="tag-3d">RTOS</span><span class="tag-3d">HAL</span></div></div>
-        <div class="card-3d reveal"><div class="card-icon"><i class="fa-solid fa-mobile-screen-button"></i></div><div class="card-title">Mobile Development</div><p>Cross-platform apps with Flutter & Dart, BLE, real-time hardware sync.</p><div class="tag-cluster"><span class="tag-3d">Flutter</span><span class="tag-3d">Dart</span><span class="tag-3d">BLoC</span><span class="tag-3d">BLE</span></div></div>
-      </div>
-    </section>
+    <section id="stack"><div class="section-eyebrow reveal">EXPERTISE MATRIX</div><h2 class="section-title reveal">Every Layer of the Stack</h2><p class="section-sub reveal">From frontend pixels to firmware bits — rare fusion of web-scale and deep embedded engineering.</p><div class="grid-3d"><div class="card-3d reveal"><div class="card-icon"><i class="fas fa-code"></i></div><div class="card-title">Frontend</div><p>Production Angular & React apps with real-time industrial dashboards.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">React</span><span class="tag-3d">TypeScript</span></div></div><div class="card-3d reveal"><div class="card-icon"><i class="fas fa-server"></i></div><div class="card-title">Backend</div><p>Scalable Node.js, Python, Express powering industrial data pipelines & MQTT.</p><div class="tag-cluster"><span class="tag-3d">Node.js</span><span class="tag-3d">Python</span><span class="tag-3d">Express</span><span class="tag-3d">MQTT</span></div></div><div class="card-3d reveal"><div class="card-icon"><i class="fas fa-database"></i></div><div class="card-title">Databases</div><p>Multi-database expertise for high-throughput industrial workloads.</p><div class="tag-cluster"><span class="tag-3d">MySQL</span><span class="tag-3d">MSSQL</span><span class="tag-3d">PostgreSQL</span><span class="tag-3d">Redis</span></div></div><div class="card-3d reveal"><div class="card-icon"><i class="fas fa-industry"></i></div><div class="card-title">Industrial Protocols</div><p>Direct PLC communication: Modbus RTU/TCP, PyLogix, Beckhoff ADS.</p><div class="tag-cluster"><span class="tag-3d">Modbus RTU/TCP</span><span class="tag-3d">PyLogix</span><span class="tag-3d">Beckhoff ADS</span></div></div><div class="card-3d reveal"><div class="card-icon"><i class="fas fa-microchip"></i></div><div class="card-title">Embedded Systems</div><p>Low-level firmware C/C++, MicroPython across ARM, AVR, Linux SBC.</p><div class="tag-cluster"><span class="tag-3d">C/C++</span><span class="tag-3d">MicroPython</span><span class="tag-3d">RTOS</span><span class="tag-3d">HAL</span></div></div><div class="card-3d reveal"><div class="card-icon"><i class="fa-solid fa-mobile-screen-button"></i></div><div class="card-title">Mobile Development</div><p>Cross-platform apps with Flutter & Dart, BLE, real-time hardware sync.</p><div class="tag-cluster"><span class="tag-3d">Flutter</span><span class="tag-3d">Dart</span><span class="tag-3d">BLoC</span><span class="tag-3d">BLE</span></div></div></div></section>
 
-    <section id="projects">
-      <div class="section-eyebrow reveal">LIVE DEPLOYMENTS</div>
-      <h2 class="section-title reveal">Systems I've Built</h2>
-      <p class="section-sub reveal">Fully deployed industrial systems running in production environments globally.</p>
-      <div class="projects-3d">
-        <div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-001 · WCS</div><div class="proj-name">Warehouse Control System</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Dynamic WCS orchestrating conveyors, sortation. Real-time material flow via Modbus TCP and PyLogix to Allen-Bradley PLCs.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">Node.js</span><span class="tag-3d">Modbus TCP</span></div></div></div>
-        <div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-002 · WMS</div><div class="proj-name">Warehouse Management System</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Advanced pallet location search & allocation with coordinate-based logic. Complex search engine with FIFO, FILO controls.</p><div class="tag-cluster"><span class="tag-3d">React</span><span class="tag-3d">Python</span><span class="tag-3d">MSSQL</span></div></div></div>
-        <div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-003 · PMS</div><div class="proj-name">Production Monitoring System</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Real-time OEE tracking, machine state monitoring, downtime analysis, live shift reports.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">Express</span><span class="tag-3d">Modbus RTU</span></div></div></div>
-        <div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-004 · ASRS</div><div class="proj-name">ASRS Control Software</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Automated Storage & Retrieval System with zone-based search, crane dispatch, dynamic conveyor handoff.</p><div class="tag-cluster"><span class="tag-3d">Python</span><span class="tag-3d">C++</span><span class="tag-3d">Modbus TCP</span></div></div></div>
-        <div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-005 · AMR</div><div class="proj-name">AMR Fleet Interface</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Autonomous Mobile Robot fleet dispatch, path coordination, battery management.</p><div class="tag-cluster"><span class="tag-3d">Node.js</span><span class="tag-3d">WebSocket</span><span class="tag-3d">MQTT</span></div></div></div>
-        <div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-006 · APS</div><div class="proj-name">Autonomous Car Parking</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Automated parking system — slot detection, guided entry/exit, payment integration.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">Node.js</span><span class="tag-3d">MySQL</span></div></div></div>
-      </div>
-    </section>
+    <section id="projects"><div class="section-eyebrow reveal">LIVE DEPLOYMENTS</div><h2 class="section-title reveal">Systems I've Built</h2><p class="section-sub reveal">Fully deployed industrial systems running in production environments globally.</p><div class="projects-3d"><div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-001 · WCS</div><div class="proj-name">Warehouse Control System</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Dynamic WCS orchestrating conveyors, sortation. Real-time material flow via Modbus TCP and PyLogix to Allen-Bradley PLCs.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">Node.js</span><span class="tag-3d">Modbus TCP</span></div></div></div><div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-002 · WMS</div><div class="proj-name">Warehouse Management System</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Advanced pallet location search & allocation with coordinate-based logic. Complex search engine with FIFO, FILO controls.</p><div class="tag-cluster"><span class="tag-3d">React</span><span class="tag-3d">Python</span><span class="tag-3d">MSSQL</span></div></div></div><div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-003 · PMS</div><div class="proj-name">Production Monitoring System</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Real-time OEE tracking, machine state monitoring, downtime analysis, live shift reports.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">Express</span><span class="tag-3d">Modbus RTU</span></div></div></div><div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-004 · ASRS</div><div class="proj-name">ASRS Control Software</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Automated Storage & Retrieval System with zone-based search, crane dispatch, dynamic conveyor handoff.</p><div class="tag-cluster"><span class="tag-3d">Python</span><span class="tag-3d">C++</span><span class="tag-3d">Modbus TCP</span></div></div></div><div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-005 · AMR</div><div class="proj-name">AMR Fleet Interface</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Autonomous Mobile Robot fleet dispatch, path coordination, battery management.</p><div class="tag-cluster"><span class="tag-3d">Node.js</span><span class="tag-3d">WebSocket</span><span class="tag-3d">MQTT</span></div></div></div><div class="proj-3d reveal"><div class="proj-header"><div class="proj-badge">SYS-006 · APS</div><div class="proj-name">Autonomous Car Parking</div><div class="proj-status"><span class="pulse-dot"></span>LIVE</div></div><div class="proj-body"><p>Automated parking system — slot detection, guided entry/exit, payment integration.</p><div class="tag-cluster"><span class="tag-3d">Angular</span><span class="tag-3d">Node.js</span><span class="tag-3d">MySQL</span></div></div></div></div></section>
 
-    <section id="embedded">
-      <div class="section-eyebrow reveal">HARDWARE MASTERY</div>
-      <h2 class="section-title reveal">Embedded & Hardware Engineering</h2>
-      <p class="section-sub reveal">From bare-metal C on ARM Cortex-M to MicroPython on ESP32 — Allen‑Bradley, Beckhoff expertise.</p>
-      <div class="boards-3d">
-        <div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-microchip"></i></div><div><h4>Arduino / AVR</h4><p>ATmega328P · C/C++ · Low-level I/O</p></div></div>
-        <div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-brain"></i></div><div><h4>STM32</h4><p>ARM Cortex-M · HAL · RTOS · CAN · SPI</p></div></div>
-        <div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-microchip"></i></div><div><h4>Raspberry Pi</h4><p>Linux · Python · GPIO · Camera Stack</p></div></div>
-        <div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-wifi"></i></div><div><h4>ESP32 / ESP8266</h4><p>MicroPython · WiFi · BLE · MQTT · OTA</p></div></div>
-        <div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-truck"></i></div><div><h4>Truck Tracker HW</h4><p>GPS · GSM · STM32 · CAN</p></div></div>
-        <div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-plug"></i></div><div><h4>PLC Interface</h4><p>Allen‑Bradley · Beckhoff · Modbus RTU/TCP</p></div></div>
-      </div>
-      <div class="terminal-3d reveal">
-        <div class="term-header-3d"><div class="term-dot-3d"></div><div class="term-dot-3d"></div><div class="term-dot-3d"></div><span style="margin-left: auto; font-size: 11px; color: #64748b;">embedded@workspace</span></div>
-        <div class="term-content"><div><span class="term-prompt">$</span> <span class="term-cmd">flash_firmware --target stm32f4 --protocol swd</span></div><div><span class="term-success">[OK]</span> MCU online · CAN bus active · RTOS running</div><div><span class="term-prompt">$</span> <span class="term-cmd">modbus_read --ip 192.168.1.50 --unit 1 --reg 40001</span></div><div><span class="term-success">Coil[40001] = 1 → CONVEYOR_RUNNING</span></div><div><span class="term-prompt">$</span> <span class="term-cmd">pylogix --plc 192.168.1.100 --tag "Conveyor_Status"</span></div><div><span class="term-success">Allen‑Bradley response: RUN_MODE = 1, ZERO_DOWNTIME_ACTIVE</span></div></div>
-      </div>
-    </section>
+    <section id="embedded"><div class="section-eyebrow reveal">HARDWARE MASTERY</div><h2 class="section-title reveal">Embedded & Hardware Engineering</h2><p class="section-sub reveal">From bare-metal C on ARM Cortex-M to MicroPython on ESP32 — Allen‑Bradley, Beckhoff expertise.</p><div class="boards-3d"><div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-microchip"></i></div><div><h4>Arduino / AVR</h4><p>ATmega328P · C/C++ · Low-level I/O</p></div></div><div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-brain"></i></div><div><h4>STM32</h4><p>ARM Cortex-M · HAL · RTOS · CAN · SPI</p></div></div><div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-microchip"></i></div><div><h4>Raspberry Pi</h4><p>Linux · Python · GPIO · Camera Stack</p></div></div><div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-wifi"></i></div><div><h4>ESP32 / ESP8266</h4><p>MicroPython · WiFi · BLE · MQTT · OTA</p></div></div><div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-truck"></i></div><div><h4>Truck Tracker HW</h4><p>GPS · GSM · STM32 · CAN</p></div></div><div class="board-3d reveal"><div class="board-icon-3d"><i class="fas fa-plug"></i></div><div><h4>PLC Interface</h4><p>Allen‑Bradley · Beckhoff · Modbus RTU/TCP</p></div></div></div><div class="terminal-3d reveal"><div class="term-header-3d"><div class="term-dot-3d"></div><div class="term-dot-3d"></div><div class="term-dot-3d"></div><span style="margin-left: auto; font-size: 11px; color: #64748b;">embedded@workspace</span></div><div class="term-content"><div><span class="term-prompt">$</span> <span class="term-cmd">flash_firmware --target stm32f4 --protocol swd</span></div><div><span class="term-success">[OK]</span> MCU online · CAN bus active · RTOS running</div><div><span class="term-prompt">$</span> <span class="term-cmd">modbus_read --ip 192.168.1.50 --unit 1 --reg 40001</span></div><div><span class="term-success">Coil[40001] = 1 → CONVEYOR_RUNNING</span></div><div><span class="term-prompt">$</span> <span class="term-cmd">pylogix --plc 192.168.1.100 --tag "Conveyor_Status"</span></div><div><span class="term-success">Allen‑Bradley response: RUN_MODE = 1, ZERO_DOWNTIME_ACTIVE</span></div></div></div></section>
 
-    <section id="mobile">
-      <div class="section-eyebrow reveal">CROSS-PLATFORM</div>
-      <h2 class="section-title reveal">Mobile Development</h2>
-      <p class="section-sub reveal">Flutter & Dart — fast, beautiful apps with embedded hardware integration.</p>
-      <div class="grid-3d">
-        <div class="card-3d reveal"><div class="card-icon"><i class="fas fa-mobile-alt"></i></div><div class="card-title">Flutter & Dart</div><p>Android, iOS, Web from one codebase. BLoC, GPS, BLE integration.</p><div class="tag-cluster"><span class="tag-3d">Dart</span><span class="tag-3d">BLoC</span><span class="tag-3d">BLE</span></div></div>
-        <div class="card-3d reveal"><div class="card-icon"><i class="fa-brands fa-bluetooth-b"></i></div><div class="card-title">Hardware Integration</div><p>Real-time BLE communication with custom embedded trackers.</p><div class="tag-cluster"><span class="tag-3d">Flutter Blue</span><span class="tag-3d">WebSocket</span><span class="tag-3d">Geofencing</span></div></div>
-      </div>
-      <div class="proj-3d reveal" style="margin-top: 28px;">
-        <div class="proj-header"><div class="proj-badge">MOB-001 · TRACKING</div><div class="proj-name">Multi-Platform Fleet Tracking App</div><div class="proj-status"><span class="pulse-dot"></span>DEPLOYED</div></div><div class="proj-body"><p>Real-time fleet tracking across Android & iOS built with Flutter, live GPS maps, geofencing, driver logs, route replay, BLE integration with custom embedded tracker units.</p><div class="tag-cluster"><span class="tag-3d">Flutter</span><span class="tag-3d">Dart</span><span class="tag-3d">BLE</span><span class="tag-3d">WebSocket</span><span class="tag-3d">Geofencing</span></div></div>
-      </div>
-    </section>
+    <section id="mobile"><div class="section-eyebrow reveal">CROSS-PLATFORM</div><h2 class="section-title reveal">Mobile Development</h2><p class="section-sub reveal">Flutter & Dart — fast, beautiful apps with embedded hardware integration.</p><div class="grid-3d"><div class="card-3d reveal"><div class="card-icon"><i class="fas fa-mobile-alt"></i></div><div class="card-title">Flutter & Dart</div><p>Android, iOS, Web from one codebase. BLoC, GPS, BLE integration.</p><div class="tag-cluster"><span class="tag-3d">Dart</span><span class="tag-3d">BLoC</span><span class="tag-3d">BLE</span></div></div><div class="card-3d reveal"><div class="card-icon"><i class="fa-brands fa-bluetooth-b"></i></div><div class="card-title">Hardware Integration</div><p>Real-time BLE communication with custom embedded trackers.</p><div class="tag-cluster"><span class="tag-3d">Flutter Blue</span><span class="tag-3d">WebSocket</span><span class="tag-3d">Geofencing</span></div></div></div><div class="proj-3d reveal" style="margin-top: 28px;"><div class="proj-header"><div class="proj-badge">MOB-001 · TRACKING</div><div class="proj-name">Multi-Platform Fleet Tracking App</div><div class="proj-status"><span class="pulse-dot"></span>DEPLOYED</div></div><div class="proj-body"><p>Real-time fleet tracking across Android & iOS built with Flutter, live GPS maps, geofencing, driver logs, route replay, BLE integration with custom embedded tracker units.</p><div class="tag-cluster"><span class="tag-3d">Flutter</span><span class="tag-3d">Dart</span><span class="tag-3d">BLE</span><span class="tag-3d">WebSocket</span><span class="tag-3d">Geofencing</span></div></div></div></section>
 
-    <section id="contact" class="contact-3d">
-      <div class="section-eyebrow reveal">SOLID. GENUINE. THE REAL DEAL.</div>
-      <h2 class="section-title reveal">Let's Build Something<br><span style="font-style: italic;">Exceptional</span></h2>
-      <p class="section-sub reveal">From warehouse floors to circuit boards — engineered right, the first time.</p>
-      <a href="mailto:nithyananthan@engineer.dev" class="cta-btn-3d"><i class="fas fa-paper-plane"></i> GET IN TOUCH</a>
-    </section>
+    <section id="contact" class="contact-3d"><div class="section-eyebrow reveal">SOLID. GENUINE. THE REAL DEAL.</div><h2 class="section-title reveal">Let's Build Something<br><span style="font-style: italic;">Exceptional</span></h2><p class="section-sub reveal">From warehouse floors to circuit boards — engineered right, the first time.</p><a href="mailto:nithyananthan@engineer.dev" class="cta-btn-3d"><i class="fas fa-paper-plane"></i> GET IN TOUCH</a></section>
 
-    <footer>
-      <div class="logo" style="font-size: 18px;">NITHYANANTHAN<span>.</span></div>
-      <div style="font-size: 12px; color: var(--text-muted);">Full Stack & Embedded Systems Architect</div>
-      <div style="font-size: 11px; color: var(--text-muted);">© 2025 All rights reserved</div>
-    </footer>
+    <footer><div class="logo" style="font-size: 18px;">R. NITHYANANTHAN</div><div style="font-size: 12px; color: var(--text-muted);">Full Stack & Embedded Systems Architect</div><div style="font-size: 11px; color: var(--text-muted);">© 2025 All rights reserved</div></footer>
   </div>
 
-  <button class="bottom-contact-btn" onclick="window.location.href='mailto:nithyananthan@engineer.dev'"><i class="fas fa-envelope"></i> Contact Me</button>
+  <button class="bottom-contact-btn" onclick="window.location.href='mailto:anandhanking707@gmail.com'"><i class="fas fa-envelope"></i> Contact Me</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     (function() {
-      // ENHANCED 3D SCENE: Larger, more detailed centerpiece
+      // ============================================
+      // REALISTIC COMET CURSOR WITH DIRECTIONAL TAIL
+      // ============================================
+      const cometCursor = document.createElement('div');
+      cometCursor.className = 'comet-cursor';
+      document.body.appendChild(cometCursor);
+      
+      const cometTail = document.createElement('div');
+      cometTail.className = 'comet-tail';
+      document.body.appendChild(cometTail);
+      
+      // Create tail segments
+      const tailSegments = [];
+      for (let i = 0; i < 8; i++) {
+        const segment = document.createElement('div');
+        segment.className = 'tail-segment';
+        cometTail.appendChild(segment);
+        tailSegments.push(segment);
+      }
+      
+      let mouseX = 0, mouseY = 0;
+      let cursorX = 0, cursorY = 0;
+      let lastMouseX = 0, lastMouseY = 0;
+      let velocityX = 0, velocityY = 0;
+      
+      document.addEventListener('mousemove', (e) => {
+        const newX = e.clientX;
+        const newY = e.clientY;
+        velocityX = newX - lastMouseX;
+        velocityY = newY - lastMouseY;
+        mouseX = newX;
+        mouseY = newY;
+        lastMouseX = newX;
+        lastMouseY = newY;
+        
+        // Reset velocity after a short delay
+        clearTimeout(window.velocityReset);
+        window.velocityReset = setTimeout(() => {
+          velocityX = 0;
+          velocityY = 0;
+        }, 50);
+      });
+      
+      function animateCursor() {
+        cursorX += (mouseX - cursorX) * 0.25;
+        cursorY += (mouseY - cursorY) * 0.25;
+        cometCursor.style.left = cursorX + 'px';
+        cometCursor.style.top = cursorY + 'px';
+        
+        // Calculate angle based on velocity (direction of movement)
+        let angle = Math.atan2(velocityY, velocityX);
+        // If no movement, use last angle or default
+        if (Math.abs(velocityX) < 0.5 && Math.abs(velocityY) < 0.5) {
+          // Keep existing angle
+        }
+        
+        const speed = Math.min(Math.sqrt(velocityX * velocityX + velocityY * velocityY) / 3, 25);
+        const tailLength = 30 + speed;
+        
+        // Update tail segments - each segment follows the previous one
+        for (let i = tailSegments.length - 1; i > 0; i--) {
+          const prevSegment = tailSegments[i-1];
+          if (prevSegment._x !== undefined) {
+            tailSegments[i]._x = prevSegment._x;
+            tailSegments[i]._y = prevSegment._y;
+            tailSegments[i]._age = prevSegment._age;
+          }
+        }
+        
+        // First segment follows cursor with offset in direction opposite to velocity
+        const offX = -Math.cos(angle) * tailLength;
+        const offY = -Math.sin(angle) * tailLength;
+        tailSegments[0]._x = cursorX + offX;
+        tailSegments[0]._y = cursorY + offY;
+        tailSegments[0]._age = 1;
+        
+        // Position and style each tail segment
+        for (let i = 0; i < tailSegments.length; i++) {
+          const seg = tailSegments[i];
+          if (seg._x !== undefined) {
+            const size = 10 - i * 0.8;
+            const opacity = 0.5 - i * 0.06;
+            seg.style.left = seg._x + 'px';
+            seg.style.top = seg._y + 'px';
+            seg.style.width = size + 'px';
+            seg.style.height = size + 'px';
+            seg.style.opacity = Math.max(0, opacity);
+            seg.style.background = `radial-gradient(circle, rgba(255, 180, 50, ${opacity * 0.8}), rgba(255, 100, 0, ${opacity * 0.4}))`;
+            seg.style.filter = `blur(${i * 0.5}px)`;
+          }
+        }
+        
+        requestAnimationFrame(animateCursor);
+      }
+      animateCursor();
+      
+      // Hover effect on interactive elements
+      const interactiveElements = document.querySelectorAll('a, button, .btn-primary, .btn-ghost, .nav-cta, .theme-toggle, .bottom-contact-btn, .cta-btn-3d');
+      interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cometCursor.style.width = '20px';
+          cometCursor.style.height = '20px';
+          cometCursor.style.background = 'radial-gradient(circle, #fff0c0, #ffaa33, #ff7700)';
+          cometCursor.style.boxShadow = '0 0 30px rgba(255, 119, 0, 1)';
+        });
+        el.addEventListener('mouseleave', () => {
+          cometCursor.style.width = '14px';
+          cometCursor.style.height = '14px';
+          cometCursor.style.background = 'radial-gradient(circle, #fff5e0, #ffcc33, #ff9900)';
+          cometCursor.style.boxShadow = '0 0 20px rgba(255, 153, 0, 0.9)';
+        });
+      });
+      
+      // ============================================
+      // ENHANCED 3D SCENE (unchanged)
+      // ============================================
       const container = document.getElementById('threeCanvas');
       const scene = new THREE.Scene();
       scene.background = null;
       
-      // Camera positioned to see the full scale of the enlarged object
       const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(0, 0, 18);
       camera.lookAt(0, 0, 0);
@@ -902,44 +1011,27 @@
       
       const group = new THREE.Group();
       
-      // LARGER CENTRAL CORE: Icosahedron radius increased for dramatic presence
       const coreGeometry = new THREE.IcosahedronGeometry(2.4, 0);
-      const coreMaterial = new THREE.MeshPhysicalMaterial({ 
-        color: 0x3b82f6, 
-        metalness: 0.7, 
-        roughness: 0.2, 
-        transparent: true, 
-        opacity: 0.35,
-        emissive: 0x0a2351,
-        emissiveIntensity: 0.15
-      });
+      const coreMaterial = new THREE.MeshPhysicalMaterial({ color: 0x3b82f6, metalness: 0.7, roughness: 0.2, transparent: true, opacity: 0.35, emissive: 0x0a2351, emissiveIntensity: 0.15 });
       const core = new THREE.Mesh(coreGeometry, coreMaterial);
       group.add(core);
       
-      // Outer wireframe shell for tech aesthetic (larger)
       const wireMat = new THREE.MeshBasicMaterial({ color: 0x60a5fa, wireframe: true, transparent: true, opacity: 0.6 });
       const wireframeShell = new THREE.Mesh(coreGeometry, wireMat);
       wireframeShell.scale.setScalar(1.05);
       group.add(wireframeShell);
       
-      // INCREASED ORBITING SATELLITES: More objects, larger radius, more dynamic
       const orbCount = 42;
       const satellites = [];
       for (let i = 0; i < orbCount; i++) {
-        // Mix of dodecahedrons and smaller spheres for variety
         let orbGeo;
         if (i % 3 === 0) orbGeo = new THREE.DodecahedronGeometry(0.22);
         else if (i % 3 === 1) orbGeo = new THREE.SphereGeometry(0.18, 16, 16);
         else orbGeo = new THREE.IcosahedronGeometry(0.2, 0);
         
-        const orbMat = new THREE.MeshStandardMaterial({ 
-          color: new THREE.Color().setHSL(0.55 + (i / orbCount) * 0.25, 0.8, 0.65), 
-          metalness: 0.6,
-          emissive: new THREE.Color().setHSL(0.55, 0.6, 0.1),
-          emissiveIntensity: 0.2
-        });
+        const orbMat = new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL(0.55 + (i / orbCount) * 0.25, 0.8, 0.65), metalness: 0.6 });
         const orb = new THREE.Mesh(orbGeo, orbMat);
-        const radius = 3.8 + Math.random() * 1.2; // Larger orbit radius
+        const radius = 3.8 + Math.random() * 1.2;
         const angle = (i / orbCount) * Math.PI * 2;
         const speed = 0.0025 + Math.random() * 0.006;
         const yOffset = (Math.random() - 0.5) * 3.2;
@@ -949,9 +1041,8 @@
         satellites.push(orb);
       }
       
-      // ADD RINGS / TORUS for extra 3D flair (larger rings)
       const ringGeometry = new THREE.TorusGeometry(3.2, 0.08, 64, 300);
-      const ringMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x1e40af, emissiveIntensity: 0.3, metalness: 0.8 });
+      const ringMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x1e40af, emissiveIntensity: 0.3 });
       const ring = new THREE.Mesh(ringGeometry, ringMat);
       ring.rotation.x = Math.PI / 2;
       group.add(ring);
@@ -965,7 +1056,6 @@
       
       scene.add(group);
       
-      // Enhanced lighting for better depth and highlight
       const ambientLight = new THREE.AmbientLight(0x2a2a4a);
       const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
       mainLight.position.set(3, 5, 4);
@@ -973,12 +1063,8 @@
       fillLight.position.set(-2, 1, 3);
       const backLight = new THREE.PointLight(0x8b5cf6, 0.7);
       backLight.position.set(0, 2, -6);
-      const rimLight = new THREE.PointLight(0x60a5fa, 0.6);
-      rimLight.position.set(2, 3, -4);
+      scene.add(ambientLight, mainLight, fillLight, backLight);
       
-      scene.add(ambientLight, mainLight, fillLight, backLight, rimLight);
-      
-      // Floating particles for extra cosmic feel (larger field)
       const particleCount = 1800;
       const particleGeometry = new THREE.BufferGeometry();
       const particlePositions = new Float32Array(particleCount * 3);
@@ -993,17 +1079,13 @@
       scene.add(particleSystem);
       
       let time = 0;
-      
-      function animate() {
-        requestAnimationFrame(animate);
+      function animate3D() {
+        requestAnimationFrame(animate3D);
         time += 0.012;
-        
-        // Main group rotation
         group.rotation.y = time * 0.15;
         group.rotation.x = Math.sin(time * 0.1) * 0.1;
         group.rotation.z = Math.cos(time * 0.07) * 0.08;
         
-        // Animate satellites orbiting
         satellites.forEach(sat => {
           sat.userData.angle += sat.userData.speed;
           sat.position.x = Math.cos(sat.userData.angle) * sat.userData.radius;
@@ -1011,22 +1093,18 @@
           sat.position.y = sat.userData.yOffset + Math.sin(time * 0.8 + sat.userData.radius) * 0.3;
           sat.rotation.x += sat.userData.rotSpeed;
           sat.rotation.y += sat.userData.rotSpeed * 1.2;
-          sat.rotation.z += sat.userData.rotSpeed * 0.8;
         });
         
-        // Animate rings
         ring.rotation.z = time * 0.2;
         ring2.rotation.x = Math.PI / 2.5 + Math.sin(time * 0.3) * 0.1;
         ring2.rotation.y = time * 0.15;
         
-        // Slight camera movement for cinematic feel
         camera.position.x = Math.sin(time * 0.1) * 0.3;
         camera.position.y = Math.cos(time * 0.13) * 0.2;
         camera.lookAt(0, 0, 0);
-        
         renderer.render(scene, camera);
       }
-      animate();
+      animate3D();
       
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -1034,9 +1112,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
       
-      // ============================================
-      // METEOR SHOWER ANIMATION (Canvas 2D)
-      // ============================================
+      // Meteor shower animation (unchanged)
       const meteorCanvas = document.getElementById('meteorCanvas');
       const ctx = meteorCanvas.getContext('2d');
       let meteors = [];
@@ -1049,55 +1125,39 @@
       resizeMeteorCanvas();
       
       class Meteor {
-        constructor() {
-          this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
-          // Start from top-left to top-center area
           this.x = Math.random() * meteorCanvas.width * 0.6;
           this.y = Math.random() * meteorCanvas.height * 0.2;
           this.length = 50 + Math.random() * 80;
-          // Direction: towards bottom-right
           this.speedX = 5 + Math.random() * 10;
           this.speedY = 3 + Math.random() * 7;
           this.opacity = 0.4 + Math.random() * 0.5;
-          this.color = `rgba(255, 180, 100, ${this.opacity})`;
           this.headColor = `rgba(255, 210, 120, 0.9)`;
-          this.active = true;
           this.size = 1.5 + Math.random() * 2;
         }
         update() {
           this.x += this.speedX;
           this.y += this.speedY;
-          // Reset when out of bounds
-          if (this.x > meteorCanvas.width + 150 || this.y > meteorCanvas.height + 150) {
-            this.reset();
-          }
+          if (this.x > meteorCanvas.width + 150 || this.y > meteorCanvas.height + 150) this.reset();
         }
         draw() {
-          if (!this.active) return;
-          // Draw meteor head (glowing)
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
           ctx.fillStyle = this.headColor;
           ctx.fill();
-          
-          // Draw trail (gradient from head backwards towards top-left)
           const trailEndX = this.x - this.length * 0.7;
           const trailEndY = this.y - this.length * 0.5;
           const gradient = ctx.createLinearGradient(this.x, this.y, trailEndX, trailEndY);
           gradient.addColorStop(0, `rgba(255, 200, 100, ${this.opacity})`);
           gradient.addColorStop(0.5, `rgba(100, 150, 255, ${this.opacity * 0.5})`);
           gradient.addColorStop(1, `rgba(59, 130, 246, 0)`);
-          
           ctx.beginPath();
           ctx.moveTo(this.x, this.y);
           ctx.lineTo(trailEndX, trailEndY);
           ctx.lineTo(this.x - this.length * 0.4, this.y - this.length * 0.3);
           ctx.fillStyle = gradient;
           ctx.fill();
-          
-          // Glow effect around head
           ctx.shadowBlur = 10;
           ctx.shadowColor = 'rgba(255, 180, 80, 0.6)';
           ctx.beginPath();
@@ -1108,19 +1168,13 @@
         }
       }
       
-      // Create meteors - fewer on mobile for performance
       const meteorCount = window.innerWidth < 768 ? 12 : 20;
-      for (let i = 0; i < meteorCount; i++) {
-        meteors.push(new Meteor());
-      }
+      for (let i = 0; i < meteorCount; i++) meteors.push(new Meteor());
       
       function animateMeteors() {
         if (!ctx) return;
         ctx.clearRect(0, 0, meteorCanvas.width, meteorCanvas.height);
-        meteors.forEach(meteor => {
-          meteor.update();
-          meteor.draw();
-        });
+        meteors.forEach(m => { m.update(); m.draw(); });
         requestAnimationFrame(animateMeteors);
       }
       animateMeteors();
@@ -1161,17 +1215,14 @@
       }, { threshold: 0.5 });
       document.querySelectorAll('[data-count]').forEach(el => countObserver.observe(el));
       
-      // Reveal animations
       const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
       }, { threshold: 0.1 });
       document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       
-      // Cursor blink
-      const cursorEl = document.getElementById('cursorBlink');
-      if (cursorEl) setInterval(() => cursorEl.style.opacity = cursorEl.style.opacity === '0' ? '1' : '0', 540);
+      const cursorBlink = document.getElementById('cursorBlink');
+      if (cursorBlink) setInterval(() => cursorBlink.style.opacity = cursorBlink.style.opacity === '0' ? '1' : '0', 540);
       
-      // Theme toggle
       const themeToggleDesktop = document.getElementById('themeToggleDesktop');
       const themeToggleMobile = document.getElementById('themeToggleMobile');
       function updateThemeUI() {
@@ -1181,25 +1232,39 @@
         if (themeToggleDesktop) themeToggleDesktop.innerHTML = `<i class="fas ${icon}"></i><span>${text}</span>`;
         if (themeToggleMobile) themeToggleMobile.innerHTML = `<i class="fas ${icon}"></i><span>${text}</span>`;
       }
-      function toggleTheme() {
-        document.body.classList.toggle('dark');
-        updateThemeUI();
-      }
+      function toggleTheme() { document.body.classList.toggle('dark'); updateThemeUI(); }
       if (themeToggleDesktop) themeToggleDesktop.addEventListener('click', toggleTheme);
       if (themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
       updateThemeUI();
       
-      // Mobile menu
+      // Mobile menu with overlay close
       const hamburger = document.getElementById('hamburgerBtn');
       const navLinks = document.getElementById('navLinks');
+      const menuOverlay = document.getElementById('menuOverlay');
+      
+      function closeMenu() {
+        navLinks.classList.remove('open');
+        menuOverlay.classList.remove('active');
+      }
+      
+      function openMenu() {
+        navLinks.classList.add('open');
+        menuOverlay.classList.add('active');
+      }
+      
       if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-          navLinks.classList.toggle('open');
+        hamburger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (navLinks.classList.contains('open')) closeMenu();
+          else openMenu();
         });
+        
+        menuOverlay.addEventListener('click', closeMenu);
         document.querySelectorAll('#navLinks a').forEach(link => {
-          link.addEventListener('click', () => {
-            navLinks.classList.remove('open');
-          });
+          link.addEventListener('click', closeMenu);
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navLinks.classList.contains('open')) closeMenu();
         });
       }
     })();
